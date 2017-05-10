@@ -17,9 +17,9 @@ def get_cache_if_exists(page_requested):
     page_html_from_db = cur.fetchone()
     if page_html_from_db:
         cur.execute("SELECT TIMESTAMPDIFF(minute,(SELECT last_updated from pages where name = %s), now())", page_requested)
-        time_diff = cur.fetchone()[0]
+        time_diff = cur.fetchone()[0]          #####  time_diff is in minutes
         if time_diff > 60:
-            insert_to_table(page_requested, page_html_from_db)
+            return False
         return page_html_from_db
     return False
 
