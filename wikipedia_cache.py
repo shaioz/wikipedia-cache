@@ -11,20 +11,24 @@ def index():
     return "hello world"
 
 def get_cache_if_exists(page_requested):
-    conn = pymysql.Connect(host="localhost", user="root", password="shai7588", db="wikipedia-cache")
+    conn = pymysql.Connect(host="localhost", user="root", password="1q2w3e4r", db="wikipedia-cache")
     cur = conn.cursor()
     cur.execute("SELECT data from pages where name = %s", (page_requested))
-    res = cur.fetchone()
-    if res:
-        return res
+    page_html_from_db = cur.fetchone()
+    if page_html_from_db:
+        cur.execute("SELECT TIMESTAMPDIFF(minute,(SELECT last_updated from pages where name = %s), now())", page_requested)
+        time_diff = cur.fetchone()[0]
+        if time_diff > 60:
+            insert_to_table(page_requested, page_html_from_db)
+        return page_html_from_db
     return False
 
 
 def insert_to_table(page_requested, new_html):
-    last_updated = str(datetime.now())
+    last_updated = datetime.now()
     connection = pymysql.connect(host='localhost',
                                  user='root',
-                                 password='shai7588',
+                                 password='1q2w3e4r',
                                  db='wikipedia-cache')
 
     try:
